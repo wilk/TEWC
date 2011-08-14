@@ -24,7 +24,7 @@ Ext.define ('TEWC.view.regions.North' , {
 		id: 'tfUserLogin' ,
 		style: {
 			position: 'absolute' ,
-			right: '120px' ,
+			right: '60px' ,
 			top: '5px' ,
 			bottom: '5px'
 		} ,
@@ -39,7 +39,7 @@ Ext.define ('TEWC.view.regions.North' , {
 		// Button position (right)
 		style: {
 			position: 'absolute' ,
-			right: '70px' ,
+			right: '10px' ,
 			top: '5px' ,
 			bottom: '5px'
 		}

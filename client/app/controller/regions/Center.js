@@ -15,7 +15,19 @@ Ext.define ('TEWC.controller.regions.Center' , {
 		this.control ({
 			'centerregion' : {
 				// TODO: setup connection
+			} ,
+			// Send message textfield
+			'centerregion > textfield' : {
+				keypress : function (field , event) {
+					if (event.getKey () == event.ENTER)
+						this.sendMsg ();
+				}
 			}
 		});
+	} ,
+	
+	// Send message
+	sendMsg: function (textfield) {
+		// TODO: send message to the server
 	}
 });

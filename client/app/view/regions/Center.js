@@ -12,12 +12,23 @@ Ext.define ('TEWC.view.regions.Center' , {
 	region: 'center' ,
 	layout: 'anchor' ,
 	items: [{
-		xtype: 'textarea' ,
-		anchor: '100% 90%'
-	} , {
-		xtype: 'textfield' ,
-		anchor: '100%' ,
-		// Disabled to default
-		disabled: true
+		xtype: 'panel' ,
+		title: 'Chat' ,
+		anchor: '100% 100%' ,
+		layout: 'anchor' ,
+		bodyPadding: '5px' ,
+		items: [{
+			// Chat area
+			xtype: 'textarea' ,
+			anchor: '100% 95%' ,
+			readOnly: true
+		} , {
+			// Send message box
+			xtype: 'textfield' ,
+			id: 'tfSendMsg' ,
+			anchor: '100%' ,
+			// Disabled to default
+			disabled: true
+		}]
 	}]
 });
