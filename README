@@ -1,0 +1,11 @@
+TEWC : The Easiest Web Chat
+A simply web chat made with ExtJS 4 and websocket of HTML5
+
+Requirements
+- Apache2 with mod_rewrite
+- PHP5
+- Mysql
+- A browser which supports websockets
+
+Install
+Unpack both client and server folders in a single.
