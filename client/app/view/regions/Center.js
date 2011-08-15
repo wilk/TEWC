@@ -20,6 +20,7 @@ Ext.define ('TEWC.view.regions.Center' , {
 		items: [{
 			// Chat area
 			xtype: 'textarea' ,
+			id: 'taChat' ,
 			anchor: '100% 95%' ,
 			readOnly: true
 		} , {
@@ -28,7 +29,9 @@ Ext.define ('TEWC.view.regions.Center' , {
 			id: 'tfSendMsg' ,
 			anchor: '100%' ,
 			// Disabled to default
-			disabled: true
+			disabled: true ,
+			enableKeyEvents: true ,
+			allowBlank: false
 		}]
 	}]
 });

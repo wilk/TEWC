@@ -8,4 +8,5 @@ Requirements
 - A browser which supports websockets
 
 Install
-Unpack both client and server folders in a single.
+- Unpack both client and server folders in a single
+- Start the websocket (e.g. php -q /var/www/server.php)
