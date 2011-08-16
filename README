@@ -7,5 +7,6 @@ Requirements
 - A browser which supports websockets
 
 Install
-- Unpack both client and server folders in a single
-- Start the websocket (e.g. php -q /var/www/server.php)
+- Unpack both client and server folders in a single one
+- Change the global 'host' variable in the 'loader.js' file (TEWC/client/loader.js). It must point to the 'server.php' file (TEWC/server/server.php)
+- Start the websocket (e.g. php -q /var/www/TEWC-test/server.php)
