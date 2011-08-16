@@ -3,20 +3,29 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>TEWC :: The Easiest Web Chat</title>
-		<link rel="stylesheet" type="text/css" href="ext-4.0.2a/resources/css/ext-all.css" />
-		<script type="text/javascript" src="ext-4.0.2a/ext-all-debug.js"> </script>
-		<script type="text/javascript" src="app.js"> </script>
 		<script type="text/javascript">
-			var userName = '';
-			var socket;
+			if ('WebSocket' in window)
+				document.write (
+					'<link rel="stylesheet" type="text/css" href="ext-4.0.2a/resources/css/ext-all.css" /\>' +
+					'<script type="text/javascript" src="ext-4.0.2a/ext-all-debug.js"\> <\/script>' +
+					'<script type="text/javascript" src="app.js"\> <\/script>' +
+					'<script type="text/javascript"\>' +
+						'var userName = \'\';' +
+						'var socket;' +
 			
-			// Set loading configuration
-			Ext.Loader.setConfig ({
-				enabled : true
-			});
-			// TODO: load ExtJS only if the browser supports websocket
-			// Import any class of ExtJS 4
-			Ext.require (['*']);
+						'// Set loading configuration\n' +
+						'Ext.Loader.setConfig ({' +
+						'	enabled : true' +
+						'});' +
+						'// Import any class of ExtJS 4\n' +
+						'Ext.require ([\'*\']);' +
+					'<\/script>'
+				);
+			else {
+				document.write ('<h1>Sorry! Your browser does not support WebSocket.</h1>');
+				document.write ('<p>Try with a new version or a different browser.</p>');
+				document.write (navigator.userAgent);
+			}
 		</script>
 	</head>
 	<body>
