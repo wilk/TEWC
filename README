@@ -2,7 +2,7 @@ TEWC : The Easiest Web Chat
 A simply web chat made with ExtJS 4 and websocket of HTML5
 
 Requirements
-- Apache2 with mod_rewrite
+- Apache2
 - PHP5
 - A browser which supports websockets
 
