@@ -16,6 +16,7 @@ Ext.define ('TEWC.view.regions.East' , {
 	collapsible: true ,
 	split: true ,
 	layout: 'anchor' ,
+	margin: '3 3 5 0' ,
 	
 	// Body
 	items: [{

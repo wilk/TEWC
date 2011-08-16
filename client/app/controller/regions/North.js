@@ -35,28 +35,39 @@ Ext.define ('TEWC.controller.regions.North' , {
 		
 		// Login
 		if (tfUser.isVisible ()) {
-			// Hide username textfield
-			tfUser.setVisible (false);
+			// Login only if the username isn't blank
+			if (tfUser.getValue().length != 0) {
 			
-			// Change login button
-			button.setText ('Logout');
+				// Hide username textfield
+				tfUser.setVisible (false);
 			
-			// Enable send message textfield
-			tfSendMsg.setDisabled (false);
+				// Change login button
+				button.setText ('Logout');
 			
-			// Set username
-			userName = tfUser.getValue ();
+				// Enable send message textfield
+				tfSendMsg.setDisabled (false);
 			
-			// Notice the chatroom that user is arrived
-			try {
-				// Send message
-				// TODO: userName strong. <b> tag doesn't works with textarea
-				socket.send (userName + ' is just arrived!');
+				// Set username
+				userName = tfUser.getValue ();
+			
+				// Notice the chatroom that user is arrived
+				try {
+					// Send message
+					socket.send ('<span style="color:green"><b>' + userName + '</b>' + ' is just arrived!</span>');
+				}
+				catch (err) {
+					Ext.Msg.show ({
+						title: 'Error' ,
+						msg: err ,
+						buttons: Ext.Msg.OK,
+						icon: Ext.Msg.ERROR
+					});
+				}
 			}
-			catch (err) {
+			else {
 				Ext.Msg.show ({
 					title: 'Error' ,
-					msg: err ,
+					msg: 'You have to fill the field with your username, dude!' ,
 					buttons: Ext.Msg.OK,
 					icon: Ext.Msg.ERROR
 				});
@@ -78,8 +89,7 @@ Ext.define ('TEWC.controller.regions.North' , {
 			// // Notice the chatroom that user is left
 			try {
 				// Send message
-				// TODO: userName strong. <b> tag doesn't works with textarea
-				socket.send (userName + ' is left!');
+				socket.send ('<span style="color:red"><b>' + userName + '</b>' + ' is left!</span>');
 			}
 			catch (err) {
 				Ext.Msg.show ({

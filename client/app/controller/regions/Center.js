@@ -29,7 +29,7 @@ Ext.define ('TEWC.controller.regions.Center' , {
 	
 	// Setup Socket Connection
 	setupConnection: function (reg) {
-		var taChat = Ext.getCmp ('taChat');
+		var divChat = document.getElementById ('chatBox');
 		// Setup socket if the browser supports it
 		if ('WebSocket' in window) {
 			try {
@@ -39,22 +39,26 @@ Ext.define ('TEWC.controller.regions.Center' , {
 				
 				// Error handler
 				socket.onerror = function (msg) {
-					taChat.setValue (taChat.getValue () + msg.data + '\n');
+					divChat.innerHTML += msg.data + '<br />';
+					divChat.scrollTop = divChat.scrollHeight;
 				}
 			
 				// Open handler
 				socket.onopen = function (msg) {
-					taChat.setValue (taChat.getValue () + 'Welcome to The Easiest Web Chat dude!\n');
+					divChat.innerHTML += '<h1 style="font-size: 2em">Welcome to The Easiest Web Chat dude!</h1><br />';
+					divChat.scrollTop = divChat.scrollHeight;
 				}
 			
 				// News from server handler
 				socket.onmessage = function (msg) {
-					taChat.setValue (taChat.getValue () + msg.data + '\n');
+					divChat.innerHTML += msg.data + '<br />';
+					divChat.scrollTop = divChat.scrollHeight;
 				}
 			
 				// Close handler
 				socket.onclose = function (msg) {
-					taChat.setValue (taChat.getValue () + 'WebSocket is down!\n');
+					divChat.innerHTML += '<b>WebSocket is down!</b><br />';
+					divChat.scrollTop = divChat.scrollHeight;
 				}
 			}
 			catch (err) {
@@ -82,8 +86,7 @@ Ext.define ('TEWC.controller.regions.Center' , {
 		if (textfield.getValue () != '') {
 			try {
 				// Send message
-				// TODO: userName strong. <b> tag doesn't works with textarea
-				socket.send (userName + ': ' + textfield.getValue ());
+				socket.send ('<b>' + userName + ':</b> ' + textfield.getValue ());
 				textfield.reset ();
 			}
 			catch (err) {

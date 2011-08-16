@@ -59,6 +59,7 @@ class WebSocket{
 
   function send($client,$msg){ 
     $this->say("> ".$msg);
+    $msg = '<i>' . date('Y-m-d H:i:s') . '</i>' . ' - ' . $msg;
     $msg = $this->wrap($msg);
     socket_write($client,$msg,strlen($msg));
   } 

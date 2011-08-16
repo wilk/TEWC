@@ -14,24 +14,20 @@ Ext.define ('TEWC.view.regions.Center' , {
 	items: [{
 		xtype: 'panel' ,
 		title: 'Chat' ,
-		anchor: '100% 100%' ,
+		anchor: '100% 95%' ,
 		layout: 'anchor' ,
 		bodyPadding: '5px' ,
-		items: [{
-			// Chat area
-			xtype: 'textarea' ,
-			id: 'taChat' ,
-			anchor: '100% 95%' ,
-			readOnly: true
-		} , {
-			// Send message box
-			xtype: 'textfield' ,
-			id: 'tfSendMsg' ,
-			anchor: '100%' ,
-			// Disabled to default
-			disabled: true ,
-			enableKeyEvents: true ,
-			allowBlank: false
-		}]
+		margin: '5 0 10 5' ,
+		html: '<div id="chatBox" style="overflow:auto;"></div>'
+	} , {
+		// Send message box
+		xtype: 'textfield' ,
+		id: 'tfSendMsg' ,
+		anchor: '100%' ,
+		// Disabled to default
+		disabled: true ,
+		enableKeyEvents: true ,
+		allowBlank: false ,
+		margin: '0 0 0 5'
 	}]
 });
