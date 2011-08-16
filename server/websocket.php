@@ -9,7 +9,8 @@ class WebSocket{
   var $sockets = array();
   var $users   = array();
   var $debug   = false;
-  var $lastDate = '';
+  var $lastDate;
+  var $usernameList = array ();
   
   function __construct($address,$port){
     error_reporting(E_ALL);
@@ -24,6 +25,8 @@ class WebSocket{
     $this->say("Server Started : ".date('Y-m-d H:i:s'));
     $this->say("Listening on   : ".$address." port ".$port);
     $this->say("Master socket  : ".$this->master."\n");
+    
+    $this->lastDate = date('l j F Y');
 
     while(true){
       $changed = $this->sockets;
@@ -40,10 +43,43 @@ class WebSocket{
           else{
             $user = $this->getuserbysocket($socket);
             if(!$user->handshake){ $this->dohandshake($user,$buffer); }
-            else{ $this->process($this->sockets,$this->unwrap($buffer)); }
+            else{ 
+            	$checkLogin = explode (" " , $this->unwrap($buffer));
+            	# Handle login
+							if ($checkLogin[0] == 'login') {
+								# Save name of the user just logged in
+								$user->name = $checkLogin[1];
+								array_push ($this->usernameList , $checkLogin[1]);
+								# Send the date to him
+								$this->send ($user->socket, '<span style="color:blue"><b>*** ' . $this->lastDate . ' ***' . '</b></span><br />');
+								# Send the updated userlist
+								$msgUserList = 'userlist ' . implode (' ' , $this->usernameList);
+								$this->sendUserList ($msgUserList);
+								# Notify every users
+								$this->process($this->sockets, '<span style="color:green"><b>' . $checkLogin[1] . '</b> is just arrived!</span>');
+							}
+							# And logout too
+							else if ($checkLogin[0] == 'logout') {
+								# Notify every users
+								$this->process($this->sockets, '<span style="color:red"><b>' . $user->name . '</b> is left!</span>');
+								# Disconnect him
+								$this->disconnect ($user->socket);
+							}
+							# Otherwise, broadcast the message
+							else
+	            	$this->process($this->sockets,$this->unwrap($buffer));
+            }
           }
         }
       }
+    }
+  }
+  
+  function sendUserList ($userlist) {
+  	foreach ($this->sockets as $socket) {
+      $user = $this->getuserbysocket($socket);
+      if ($user != null)
+	      $this->send($user->socket,$userlist);
     }
   }
 
@@ -84,7 +120,14 @@ class WebSocket{
     for($i=0;$i<$n;$i++){
       if($this->users[$i]->socket==$socket){ $found=$i; break; }
     }
-    if(!is_null($found)){ array_splice($this->users,$found,1); }
+    if(!is_null($found)){ 
+    	array_splice($this->users,$found,1); 
+    	array_splice ($this->usernameList,$found,1);
+    	# Send the updated userlist
+			$msgUserList = 'userlist ' . implode (' ' , $this->usernameList);
+			$this->say ($msgUserList);
+			$this->sendUserList ($msgUserList);
+    }
     $index=array_search($socket,$this->sockets);
     socket_close($socket);
     $this->log($socket." DISCONNECTED!");
@@ -92,22 +135,14 @@ class WebSocket{
   }
 
   function dohandshake($user,$buffer){
-    $this->log("\nRequesting handshake...");
-    $this->log($buffer);
+    $this->say("\nRequesting handshake...");
+    $this->say($buffer);
     list($resource,$host,$origin) = $this->getheaders($buffer);
-    $this->log("Handshaking...");
-    $upgrade  = "HTTP/1.1 101 Web Socket Protocol Handshake\r\n" .
-                "Upgrade: WebSocket\r\n" .
-                "Connection: Upgrade\r\n" .
-                "WebSocket-Origin: " . $origin . "\r\n" .
-                "WebSocket-Location: ws://" . $host . $resource . "\r\n" .
-                "\r\n";
-#    socket_write($user->socket,$upgrade.chr(0),strlen($upgrade.chr(0)));
+    $this->say("Handshaking...");
     $hs = (string)new WebSocketHandshake($buffer);
     socket_write($user->socket,$hs,strlen($hs));
     $user->handshake=true;
-    $this->log($upgrade);
-    $this->log("Done handshaking...");
+    $this->say("Done handshaking...");
     return true;
   }
 
@@ -138,6 +173,7 @@ class User{
   var $id;
   var $socket;
   var $handshake;
+  var $name;
 }
 
 ?>

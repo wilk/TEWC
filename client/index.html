@@ -9,25 +9,16 @@
 					'<link rel="stylesheet" type="text/css" href="ext-4.0.2a/resources/css/ext-all.css" /\>' +
 					'<script type="text/javascript" src="ext-4.0.2a/ext-all-debug.js"\> <\/script>' +
 					'<script type="text/javascript" src="app.js"\> <\/script>' +
-					'<script type="text/javascript"\>' +
-						'var userName = \'\';' +
-						'var socket;' +
-			
-						'// Set loading configuration\n' +
-						'Ext.Loader.setConfig ({' +
-						'	enabled : true' +
-						'});' +
-						'// Import any class of ExtJS 4\n' +
-						'Ext.require ([\'*\']);' +
-					'<\/script>'
+					'<script type="text/javascript" src="loader.js"\> <\/script>'
 				);
 			else {
+				// TODO: improve error window
 				document.write ('<h1>Sorry! Your browser does not support WebSocket.</h1>');
 				document.write ('<p>Try with a new version or a different browser.</p>');
 				document.write (navigator.userAgent);
 			}
 		</script>
 	</head>
-	<body>
+	<body onUnload="closeWebSocket ();">
 	</body>
 </html>

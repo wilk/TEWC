@@ -8,14 +8,5 @@ Ext.define ('TEWC.controller.regions.East' , {
 	extend: 'Ext.app.Controller' ,
 	
 	// Views
-	views: ['regions.East'] ,
-	
-	// Configuration
-	init: function () {
-		this.control ({
-			'eastregion' : {
-				// TODO: start connection to retrieve the users list
-			}
-		});
-	}
+	views: ['regions.East']
 });

@@ -13,8 +13,14 @@ Ext.define ('TEWC.controller.regions.Center' , {
 	// Configuration
 	init: function () {
 		this.control ({
-			'centerregion' : {
-				afterrender : this.setupConnection
+			// Center region
+			'centerregion > panel' : {
+				// Resize the div chat when the panel chat is resized
+				resize : function (reg, width, height, opts) {
+					var divChat = document.getElementById ('chatBox');
+					divChat.style.height = (height - 33) + 'px';
+					divChat.style.width = (width - 10) + 'px';
+				}
 			} ,
 			// Send message textfield
 			'#tfSendMsg' : {
@@ -27,71 +33,13 @@ Ext.define ('TEWC.controller.regions.Center' , {
 		});
 	} ,
 	
-	// Setup Socket Connection
-	setupConnection: function (reg) {
-		var divChat = document.getElementById ('chatBox');
-		var panelChat = reg.down('panel');
-		
-		// Setup socket if the browser supports it
-		if ('WebSocket' in window) {
-			try {
-				var host = 'ws://localhost:12345/test-TEWC/server.php';
-				// Build a new socket
-				socket = new WebSocket (host);
-				
-				// Error handler
-				socket.onerror = function (msg) {
-					divChat.innerHTML += msg.data + '<br />';
-					divChat.scrollTop = divChat.scrollHeight;
-				}
-			
-				// Open handler
-				socket.onopen = function (msg) {
-					divChat.innerHTML += '<h1 style="font-size: 2em">Welcome to The Easiest Web Chat dude!</h1><br />';
-					// Get the panel size to resize divChat
-					panelChatSize = panelChat.getSize ();
-					// The most recent message is always visible
-					divChat.style.height = (panelChatSize.height - 33) + 'px';
-				}
-			
-				// News from server handler
-				socket.onmessage = function (msg) {
-					divChat.innerHTML += msg.data + '<br />';
-					divChat.scrollTop = divChat.scrollHeight;
-				}
-			
-				// Close handler
-				socket.onclose = function (msg) {
-					divChat.innerHTML += '<span style="color:red"><b>*** WebSocket is down! ***</b></span><br />';
-					divChat.scrollTop = divChat.scrollHeight;
-				}
-			}
-			catch (err) {
-				Ext.Msg.show ({
-					title: 'Error' ,
-					msg: err ,
-					buttons: Ext.Msg.OK,
-					icon: Ext.Msg.ERROR
-				});
-			}
-		}
-		else {
-			Ext.Msg.show ({
-				title: 'Error' ,
-				msg: 'Your browser doesn\'t supports websocket.' ,
-				buttons: Ext.Msg.OK,
-				icon: Ext.Msg.ERROR
-			});
-		}
-	} ,
-	
 	// Send message
 	sendMsg: function (textfield) {
 		// Empty messages aren't accepted
 		if (textfield.getValue () != '') {
 			try {
 				// Send message
-				socket.send ('<b>' + userName + ':</b> ' + textfield.getValue ());
+				socket.send ('<b>' + userName + ':</b> ' + this.html2text (textfield.getValue ()));
 				textfield.reset ();
 			}
 			catch (err) {
@@ -103,5 +51,12 @@ Ext.define ('TEWC.controller.regions.Center' , {
 				});
 			}
 		}
+	} ,
+	
+	// Convert < in &lt; and > in &gt;
+	html2text: function (msg) {
+		msg = msg.replace (/</g , '&lt;');
+		msg = msg.replace (/>/g , '&gt;');
+		return msg;
 	}
 });

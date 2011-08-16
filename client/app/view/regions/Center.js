@@ -14,6 +14,7 @@ Ext.define ('TEWC.view.regions.Center' , {
 	items: [{
 		xtype: 'panel' ,
 		title: 'Chat' ,
+		id: 'chatPanel' ,
 		anchor: '100% 95%' ,
 		layout: 'anchor' ,
 		bodyPadding: '5px' ,

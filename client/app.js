@@ -25,6 +25,7 @@ Ext.application ({
 			] ,
 	
 			// Configuration
+			id: 'mainViewport' ,
 			layout: 'border' ,
 	
 			// Body
