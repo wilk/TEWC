@@ -60,10 +60,11 @@ class WebSocket{
 							}
 							# And logout too
 							else if ($checkLogin[0] == 'logout') {
-								# Notify every users
-								$this->process($this->sockets, '<span style="color:red"><b>' . $user->name . '</b> is left!</span>');
+								$userToLogout = $user->name;
 								# Disconnect him
 								$this->disconnect ($user->socket);
+								# Notify every users except the disconnected one
+								$this->process($this->sockets, '<span style="color:red"><b>' . $userToLogout . '</b> is left!</span>');
 							}
 							# Otherwise, broadcast the message
 							else

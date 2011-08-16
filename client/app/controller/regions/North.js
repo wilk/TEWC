@@ -35,13 +35,15 @@ Ext.define ('TEWC.controller.regions.North' , {
 		var tfUser = button.up('northregion').down ('textfield');
 		var tfSendMsg = Ext.getCmp ('tfSendMsg');
 		
+		var divChat = document.getElementById ('chatBox');
+		var usersStore = this.getRegionsEastStore ();
+		
 		// Login
 		if (tfUser.isVisible ()) {
 			// Login only if the username isn't blank, without spaces too
 			if ((tfUser.getValue().length > 0) && (tfUser.getValue().length < 20) && (tfUser.getValue().split(/\s/g).length < 2)) {
-				var divChat = document.getElementById ('chatBox');
+				
 				var panelChat = Ext.getCmp ('chatPanel');
-				var usersStore = this.getRegionsEastStore ();
 				
 				// Connect
 				try {
@@ -56,6 +58,9 @@ Ext.define ('TEWC.controller.regions.North' , {
 			
 					// Open handler
 					socket.onopen = function (msg) {
+						// Set username
+						userName = tfUser.getValue ();
+						
 						divChat.innerHTML += '<h1 style="font-size: 2em">Welcome to The Easiest Web Chat dude!</h1><br />';
 						
 						// Notice the chatroom you are arrived
@@ -111,14 +116,51 @@ Ext.define ('TEWC.controller.regions.North' , {
 			
 					// Close handler
 					socket.onclose = function (msg) {
-						divChat.innerHTML += '<br /><h1 style="font-size: 2em">Goodbye dude!</h1><br />';
-						divChat.scrollTop = divChat.scrollHeight;
+						// If it's a normal logout
+						if ((button.getText () == 'Login') && (userName != '')) {
+							divChat.innerHTML += '<br /><h1 style="font-size: 2em">Goodbye dude!</h1><br />';
+							divChat.scrollTop = divChat.scrollHeight;
+							
+							// Reset username
+							userName = '';
+						}
+						// If user is trying to login with the websocket closed
+						else if ((button.getText () == 'Login') && (userName == '')) {
+							Ext.Msg.show ({
+								title: 'Error' ,
+								msg: 'WebSocket is closed. Your actions are useless.' ,
+								buttons: Ext.Msg.OK ,
+								icon: Ext.Msg.ERROR
+							});
+						}
+						// If websocket is closed by server
+						else {
+							divChat.innerHTML += '<br /><span style="color:red">*** Something goes wrong! WebSocket closed by server. ***</span><br />';
+							divChat.scrollTop = divChat.scrollHeight;
+							
+							// Reset title of the chatroom
+							panelChat.setTitle ('Chat');
 						
-						// Reset title of the chatroom
-						panelChat.setTitle ('Chat');
+							// Update userlist
+							usersStore.removeAll ();
 						
-						// Update userlist
-						usersStore.removeAll ();
+							// Reset and show username textfield
+							tfUser.reset ();
+							tfUser.setVisible (true);
+			
+							// Change login button
+							button.setText ('Login');
+			
+							// Reset and disable send message textfield
+							tfSendMsg.reset ();
+							tfSendMsg.setDisabled (true);
+			
+							// Reset username
+							userName = '';
+			
+							// Set focus to the username textfield
+							tfUser.focus ();
+						}
 					}
 				}
 				catch (err) {
@@ -129,9 +171,6 @@ Ext.define ('TEWC.controller.regions.North' , {
 						icon: Ext.Msg.ERROR
 					});
 				}
-			
-				// Set username
-				userName = tfUser.getValue ();
 			}
 			else {
 				Ext.Msg.show ({
@@ -148,21 +187,21 @@ Ext.define ('TEWC.controller.regions.North' , {
 		}
 		// Logout
 		else {
+			// Change login button
+			button.setText ('Login');
+			
 			// Reset and show username textfield
 			tfUser.reset ();
 			tfUser.setVisible (true);
-			
-			// Change login button
-			button.setText ('Login');
 			
 			// Reset and disable send message textfield
 			tfSendMsg.reset ();
 			tfSendMsg.setDisabled (true);
 			
-			closeWebSocket ();
+			// Update userlist
+			usersStore.removeAll ();
 			
-			// Reset username
-			userName = '';
+			closeWebSocket ();
 			
 			// Set focus to the username textfield
 			tfUser.focus ();
