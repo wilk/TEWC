@@ -9,7 +9,7 @@ class WebSocket{
   var $sockets = array();
   var $users   = array();
   var $debug   = false;
-  var $hs;
+  var $lastDate = '';
   
   function __construct($address,$port){
     error_reporting(E_ALL);
@@ -51,17 +51,22 @@ class WebSocket{
     /* Extend and modify this method to suit your needs */
     /* Basic usage is to echo incoming messages back to client */
     /* Send the message to each user connected */
+    $msg = '<i>' . date('H:i:s') . '</i>' . ' - ' . $msg;
+    if ($this->lastDate != date('l j F Y')) {
+    	$this->lastDate = date('l j F Y');
+    	$msg = '<br /><span style="color:blue"><b>*** ' . $this->lastDate . ' ***' . '</b></span><br /><br />' . $msg;
+    }
     foreach ($socketList as $socket) {
       $user = $this->getuserbysocket($socket);
-      $this->send($user->socket,$msg);
+      if ($user != null)
+	      $this->send($user->socket,$msg);
     }
   }
 
   function send($client,$msg){ 
     $this->say("> ".$msg);
-    $msg = '<i>' . date('Y-m-d H:i:s') . '</i>' . ' - ' . $msg;
     $msg = $this->wrap($msg);
-    socket_write($client,$msg,strlen($msg));
+  	socket_write($client,$msg,strlen($msg));
   } 
 
   function connect($socket){

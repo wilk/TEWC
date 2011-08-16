@@ -18,7 +18,7 @@ Ext.define ('TEWC.view.regions.Center' , {
 		layout: 'anchor' ,
 		bodyPadding: '5px' ,
 		margin: '5 0 10 5' ,
-		html: '<div id="chatBox" style="overflow:auto;"></div>'
+		html: '<div id="chatBox" style="overflow-x:auto; overflow-y:auto;"></div>'
 	} , {
 		// Send message box
 		xtype: 'textfield' ,

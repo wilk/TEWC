@@ -30,6 +30,8 @@ Ext.define ('TEWC.controller.regions.Center' , {
 	// Setup Socket Connection
 	setupConnection: function (reg) {
 		var divChat = document.getElementById ('chatBox');
+		var panelChat = reg.down('panel');
+		
 		// Setup socket if the browser supports it
 		if ('WebSocket' in window) {
 			try {
@@ -46,7 +48,10 @@ Ext.define ('TEWC.controller.regions.Center' , {
 				// Open handler
 				socket.onopen = function (msg) {
 					divChat.innerHTML += '<h1 style="font-size: 2em">Welcome to The Easiest Web Chat dude!</h1><br />';
-					divChat.scrollTop = divChat.scrollHeight;
+					// Get the panel size to resize divChat
+					panelChatSize = panelChat.getSize ();
+					// The most recent message is always visible
+					divChat.style.height = (panelChatSize.height - 33) + 'px';
 				}
 			
 				// News from server handler
@@ -57,7 +62,7 @@ Ext.define ('TEWC.controller.regions.Center' , {
 			
 				// Close handler
 				socket.onclose = function (msg) {
-					divChat.innerHTML += '<b>WebSocket is down!</b><br />';
+					divChat.innerHTML += '<span style="color:red"><b>*** WebSocket is down! ***</b></span><br />';
 					divChat.scrollTop = divChat.scrollHeight;
 				}
 			}
