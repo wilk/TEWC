@@ -12,8 +12,16 @@ var host = 'ws://localhost:12345/test-TEWC/server.php';
 Ext.Loader.setConfig ({
 	enabled : true
 });
+
 // Import any class of ExtJS 4
-Ext.require (['*']);
+Ext.require ([
+	'Ext.window.Window' ,
+	'Ext.window.MessageBox' ,
+	'Ext.grid.Panel' ,
+	'Ext.form.field.Text' ,
+	'Ext.form.field.TextArea' ,
+	'Ext.button.Button'	
+]);
 
 // When the browser is closed, close the socket too
 function closeWebSocket () {
