@@ -4,13 +4,26 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>TEWC :: The Easiest Web Chat</title>
 		<script type="text/javascript">
-			if ('WebSocket' in window)
+			// Remove loading progress bar after page loaded
+			function clearProgress () {
+				document.getElementsByTagName('body')[0].removeChild (document.getElementById ('extjsPreloader'));
+			}
+		</script>
+	</head>
+	<body onUnload="closeWebSocket ();" onLoad="clearProgress ();">
+		<script type="text/javascript">
+			// Check if browser supports WebSocket
+			// TODO: support for Firefox 6 (MozWebSocket)
+			if ('WebSocket' in window) {
+				// Loading Progress Bar
+				document.write ('<div id="extjsPreloader">Loading ExtJS Framework... <br /\><progress style="width:400px" /\></div>');
 				document.write (
 					'<link rel="stylesheet" type="text/css" href="ext-4.0.2a/resources/css/ext-all.css" /\>' +
 					'<script type="text/javascript" src="ext-4.0.2a/ext-all-debug.js"\> <\/script>' +
 					'<script type="text/javascript" src="app.js"\> <\/script>' +
 					'<script type="text/javascript" src="loader.js"\> <\/script>'
 				);
+			}
 			else {
 				// TODO: improve error window
 				document.write ('<h1>Sorry! Your browser does not support WebSocket.</h1>');
@@ -18,7 +31,5 @@
 				document.write (navigator.userAgent);
 			}
 		</script>
-	</head>
-	<body onUnload="closeWebSocket ();">
 	</body>
 </html>
