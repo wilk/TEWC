@@ -25,10 +25,9 @@ Ext.require ([
 
 // When the browser is closed, close the socket too
 function closeWebSocket () {
-	// TODO: use socket.close ()
 	try {
 		if (socket.readyState == 1)
-			socket.send ('logout');
+			socket.close ();
 	}
 	catch (err) {
 		Ext.Msg.show ({

@@ -35,7 +35,7 @@ Ext.define ('TEWC.controller.regions.North' , {
 		var tfUser = button.up('northregion').down ('textfield');
 		var tfSendMsg = Ext.getCmp ('tfSendMsg');
 		
-		var divChat = document.getElementById ('chatBox');
+		var divChat = Ext.get ('chatBox');
 		var usersStore = this.getRegionsEastStore ();
 		
 		// Login
@@ -52,8 +52,8 @@ Ext.define ('TEWC.controller.regions.North' , {
 				
 					// Error handler
 					socket.onerror = function (msg) {
-						divChat.innerHTML += msg.data + '<br />';
-						divChat.scrollTop = divChat.scrollHeight;
+						divChat.insertHtml ('beforeEnd' , msg.data + '<br />');
+						divChat.scroll ('b', divChat.getHeight (true));
 					}
 			
 					// Open handler
@@ -61,7 +61,8 @@ Ext.define ('TEWC.controller.regions.North' , {
 						// Set username
 						userName = tfUser.getValue ();
 						
-						divChat.innerHTML += '<h1 style="font-size: 2em">Welcome to The Easiest Web Chat dude!</h1><br />';
+						divChat.insertHtml ('beforeEnd' , '<h1 style="font-size: 2em">Welcome to The Easiest Web Chat dude!</h1><br />');
+						divChat.scroll ('b', divChat.getHeight (true));
 						
 						// Notice the chatroom you are arrived
 						socket.send ('login ' + userName);
@@ -109,34 +110,36 @@ Ext.define ('TEWC.controller.regions.North' , {
 							usersStore.sort ('user' , 'ASC');
 						}
 						else {
-							divChat.innerHTML += msg.data + '<br />';
-							divChat.scrollTop = divChat.scrollHeight;
+							divChat.insertHtml ('beforeEnd' , msg.data + '<br />');
+							divChat.scroll ('b', divChat.getHeight (true));
 						}
 					}
 			
 					// Close handler
 					socket.onclose = function (msg) {
-						// If it's a normal logout
-						if ((button.getText () == 'Login') && (userName != '')) {
-							divChat.innerHTML += '<br /><h1 style="font-size: 2em">Goodbye dude!</h1><br />';
-							divChat.scrollTop = divChat.scrollHeight;
-							
-							// Reset username
-							userName = '';
-						}
-						// If user is trying to login with the websocket closed
-						else if ((button.getText () == 'Login') && (userName == '')) {
+						// If user is trying to login when the websocket is closed
+						if (userName == '') {
 							Ext.Msg.show ({
 								title: 'Error' ,
 								msg: 'WebSocket is closed. Your actions are useless.' ,
 								buttons: Ext.Msg.OK ,
 								icon: Ext.Msg.ERROR
 							});
+							
+							// Set focus to the username textfield
+							tfUser.focus ();
 						}
-						// If websocket is closed by server
 						else {
-							divChat.innerHTML += '<br /><span style="color:red">*** Something goes wrong! WebSocket closed by server. ***</span><br />';
-							divChat.scrollTop = divChat.scrollHeight;
+							// If it's a normal logout
+							if ((button.getText () == 'Login') && (userName != '')) {
+								divChat.insertHtml ('beforeEnd' , '<br /><h1 style="font-size: 2em">Goodbye dude!</h1><br />');
+							}
+							// If websocket is closed by server
+							else {
+								divChat.insertHtml ('beforeEnd' , '<br /><span style="color:red">*** Something goes wrong! WebSocket closed by server. ***</span><br />');
+							}
+							
+							divChat.scroll ('b', divChat.getHeight (true));
 							
 							// Reset title of the chatroom
 							panelChat.setTitle ('Chat');
@@ -147,9 +150,6 @@ Ext.define ('TEWC.controller.regions.North' , {
 							// Reset and show username textfield
 							tfUser.reset ();
 							tfUser.setVisible (true);
-			
-							// Change login button
-							button.setText ('Login');
 			
 							// Reset and disable send message textfield
 							tfSendMsg.reset ();
@@ -190,21 +190,7 @@ Ext.define ('TEWC.controller.regions.North' , {
 			// Change login button
 			button.setText ('Login');
 			
-			// Reset and show username textfield
-			tfUser.reset ();
-			tfUser.setVisible (true);
-			
-			// Reset and disable send message textfield
-			tfSendMsg.reset ();
-			tfSendMsg.setDisabled (true);
-			
-			// Update userlist
-			usersStore.removeAll ();
-			
 			closeWebSocket ();
-			
-			// Set focus to the username textfield
-			tfUser.focus ();
 		}
 	}
 });
