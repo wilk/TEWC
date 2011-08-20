@@ -18,36 +18,8 @@ Ext.define ('TEWC.controller.regions.Center' , {
 			// Center region
 			'centerregion > tabpanel' : {
 				// Resize the div chat when the panel chat is resized
-				resize : function (panel, width, height, opts) {
-					// Useful when resize event is fired
-					if (width == null) width = Ext.getCmp('chatPanel').getWidth ();
-					if (height == null) height = Ext.getCmp('chatPanel').getHeight ();
-				
-					// Always Main Room resize
-					var divChat = document.getElementById ('mainRoom');
-					
-					divChat.style.height = (height - 33) + 'px';
-					divChat.style.width = (width - 10) + 'px';
-					
-					// Check for other tabs
-					var userStore = this.getRegionsEastStore ();
-					
-					// Don't count userself
-					if (userStore.getCount () > 1) {
-						for (var i = 0; i < userStore.getCount (); i++) {
-							var user = userStore.getAt(i).get ('user');
-								if (user != userName) {
-									divChat = document.getElementById ('room_' + user);
-									
-									// Resize only existing private chats
-									if (divChat != null) {
-										divChat.style.height = (height - 33) + 'px';
-										divChat.style.width = (width - 10) + 'px';
-									}
-								}
-						}
-					}
-				}
+				resize : this.updateResize ,
+				tabchange : this.updateScroll
 			} ,
 			// Send message textfield
 			'#tfSendMsg' : {
@@ -58,6 +30,56 @@ Ext.define ('TEWC.controller.regions.Center' , {
 				}
 			}
 		});
+	} ,
+	
+	// Scroll on bottom when a tab get the focus
+	updateScroll: function (panel, newTab, oldTab, opts) {
+		var divChat;
+		
+		// Mainroom
+		if (newTab.title == 'Central Square') {
+			divChat = Ext.get ('mainRoom');
+		}
+		// Private rooms
+		else {
+			divChat = Ext.get ('room_' + newTab.title);
+		}
+		
+		divChat.scroll ('b', divChat.getHeight (true));
+		
+		Ext.getCmp('tfSendMsg').focus ();
+	} ,
+	
+	// Update the resize of the div
+	updateResize: function (panel, width, height, opts) {
+		// Useful when resize event is fired
+		if (width == null) width = Ext.getCmp('chatPanel').getWidth ();
+		if (height == null) height = Ext.getCmp('chatPanel').getHeight ();
+	
+		// Always Main Room resize
+		var divChat = document.getElementById ('mainRoom');
+		
+		divChat.style.height = (height - 35) + 'px';
+		divChat.style.width = (width - 10) + 'px';
+		
+		// Check for other tabs
+		var userStore = this.getRegionsEastStore ();
+		
+		// Don't count userself
+		if (userStore.getCount () > 1) {
+			for (var i = 0; i < userStore.getCount (); i++) {
+				var user = userStore.getAt(i).get ('user');
+					if (user != userName) {
+						divChat = document.getElementById ('room_' + user);
+						
+						// Resize only existing private chats
+						if (divChat != null) {
+							divChat.style.height = (height - 35) + 'px';
+							divChat.style.width = (width - 10) + 'px';
+						}
+					}
+			}
+		}
 	} ,
 	
 	// Send message
@@ -81,7 +103,7 @@ Ext.define ('TEWC.controller.regions.Center' , {
 					
 					if (userStore.findRecord ('user', receiverUsername) != null) {
 						var msgText = this.html2text (textfield.getValue ());
-						toSend.push (['private' , msgText, receiverUsername]);
+						toSend.push (['private' , receiverUsername, msgText]);
 						socket.send (toSend);
 					}
 					else {

@@ -62,12 +62,13 @@ class WebSocket {
 									break;
 								# Broadcast the message
 								case 'global':
-									$this->sendGlobal ($checkMsg[1], $user);
+									# Get the entire message, included ','
+									$this->sendGlobal (substr ($this->unwrap ($buffer), strlen ($checkMsg[0]) + 1), $user);
 									break;
 								# Send message back to the sender and to the receiver
 								case 'private':
-									# Message, sender, receiver
-									$this->sendPrivate ($checkMsg[1], $user, $checkMsg[2]);
+									# Sender, receiver, message
+									$this->sendPrivate ($user, $checkMsg[1], substr ($this->unwrap ($buffer), strlen ($checkMsg[0]) + strlen ($checkMsg[1]) + 2));
 									break;
 							}
 						}
@@ -97,7 +98,7 @@ class WebSocket {
 	}
 	
 	# Send message both to the sender and to the receiver
-	function sendPrivate ($msg, $sender, $receiver) {
+	function sendPrivate ($sender, $receiver, $msg) {
 		# Get user object of the receiver
 		$receiver = $this->findUserByName ($receiver);
 		
@@ -196,7 +197,7 @@ class WebSocket {
 				# Send the updated userlist
 				$msgUserList = 'userlist:' . implode (':' , $this->usernameList);
 				# Notify every users except the disconnected one
-				$this->process ('<span style="color:red"><b>' . $disconnectedUser . '</b> is left!</span>');
+				$this->process ('<span style="color:red"><b>' . $disconnectedUser . '</b> has left!</span>');
 				$this->say ($msgUserList);
 				$this->sendUserList ($msgUserList);
 			}

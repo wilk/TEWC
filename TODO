@@ -1,2 +1,7 @@
 - rooms for private user-to-user chat
 - compatibility with firefox
+
+- tab title: problem with name too shorter
+- problem with row layout
+- problem with resizeing of the window
+- add a wrap to cut a row in 2 when it's too long
