@@ -20,7 +20,8 @@ Ext.require ([
 	'Ext.grid.Panel' ,
 	'Ext.form.field.Text' ,
 	'Ext.form.field.TextArea' ,
-	'Ext.button.Button'	
+	'Ext.button.Button' ,
+	'Ext.tab.Panel'
 ]);
 
 // When the browser is closed, close the socket too

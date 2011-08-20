@@ -35,7 +35,7 @@ Ext.define ('TEWC.controller.regions.North' , {
 		var tfUser = button.up('northregion').down ('textfield');
 		var tfSendMsg = Ext.getCmp ('tfSendMsg');
 		
-		var divChat = Ext.get ('chatBox');
+		var divChat = Ext.get ('mainRoom');
 		var usersStore = this.getRegionsEastStore ();
 		
 		// Login
@@ -64,8 +64,9 @@ Ext.define ('TEWC.controller.regions.North' , {
 						divChat.insertHtml ('beforeEnd' , '<h1 style="font-size: 2em">Welcome to The Easiest Web Chat dude!</h1><br />');
 						divChat.scroll ('b', divChat.getHeight (true));
 						
-						// Notice the chatroom you are arrived
-						socket.send ('login ' + userName);
+						var toSend = new Array (['login' , userName]);
+						
+						socket.send (toSend);
 						
 						// Hide username textfield
 						tfUser.setVisible (false);
@@ -76,42 +77,80 @@ Ext.define ('TEWC.controller.regions.North' , {
 						// Enable send message textfield
 						tfSendMsg.setDisabled (false);
 						
-						panelChat.setTitle ('Chat :: ' + userName);
-						
 						// Set focus to the username textfield
 						Ext.getCmp('tfSendMsg').focus ();
 					}
 			
 					// News from server handler
 					socket.onmessage = function (msg) {
-						var userList = msg.data.split (' ');
-						// If is arrived userlist, handle it
-						if (userList[0] == 'userlist') {
-							// Update the username store
-							usersStore.removeAll ();
+						var msgExploded = msg.data.split (':');
+						if (msgExploded[0] == 'global') {
+							// If is arrived userlist, handle it
+							if (msgExploded[1] == 'userlist') {
+								// Update the username store
+								usersStore.removeAll ();
 							
-							// Add every user to the right grid
-							for (var index in userList) {
-								// To avoid 'userlist'
-								if (index != 0) {
-									// TODO: to avoid strange ExtJS error
-									try {
-										usersStore.add ({
-											user : userList[index]
-										});
-									}
-									catch (err) {
-										continue;
+								// Add every user to the right grid
+								for (var index in msgExploded) {
+									// To avoid 'global' and 'userlist'
+									if (index > 1) {
+										// TODO: to avoid strange ExtJS error
+										try {
+											usersStore.add ({
+												user : msgExploded[index]
+											});
+										}
+										catch (err) {
+											continue;
+										}
 									}
 								}
-							}
 							
-							// And sort the store
-							usersStore.sort ('user' , 'ASC');
+								// And sort the store
+								usersStore.sort ('user' , 'ASC');
+							}
+							// Send message into the Main Room
+							else {
+								// To avoid 'global:'
+								divChat.insertHtml ('beforeEnd' , msg.data.slice (msgExploded[0].length + 1) + '<br />');
+								divChat.scroll ('b', divChat.getHeight (true));
+							}
 						}
-						else {
-							divChat.insertHtml ('beforeEnd' , msg.data + '<br />');
-							divChat.scroll ('b', divChat.getHeight (true));
+						// Private rooms
+						else if (msgExploded[0] == 'private') {
+							// TODO: temporaly solution
+							var currentTab = panelChat.getActiveTab ();
+							panelChat.setActiveTab (Ext.getCmp ('tab_' + msgExploded[1]));
+							panelChat.setActiveTab (currentTab);
+							
+							// TODO: more than one room are created when a message is came
+							var divRoom = Ext.get ('room_' + msgExploded[1]);
+							
+							// Message without parameters
+							var msgToShow = msg.data.slice (msgExploded[0].length + msgExploded[1].length + 2);
+							
+							// Someone wants to start a private communication
+							if (divRoom == null) {
+							// TODO: problem with divRoom
+//							if (Ext.getCmp ('tab_' + msgExploded[1]) == null) {
+								// Add a new tab with a unique index
+								var tab = panelChat.add ({
+									title: msgExploded[1] ,
+									id: 'tab_' + msgExploded[1] ,
+									closable: true ,
+									html: '<div id="room_' + msgExploded[1] +'" style="overflow-x:auto; overflow-y:auto">' + msgToShow + '<br /></div>'
+								})
+								
+								// Resize the tab
+								panelChat.fireEvent ('resize');
+		
+								// Then give the focus to the textfield
+								tfSendMsg.focus ();
+							}
+							else {
+								divRoom.insertHtml ('beforeEnd' , msgToShow + '<br />');
+								divRoom.scroll ('b', divRoom.getHeight (true));
+							}
 						}
 					}
 			
@@ -141,9 +180,6 @@ Ext.define ('TEWC.controller.regions.North' , {
 							
 							divChat.scroll ('b', divChat.getHeight (true));
 							
-							// Reset title of the chatroom
-							panelChat.setTitle ('Chat');
-						
 							// Update userlist
 							usersStore.removeAll ();
 						

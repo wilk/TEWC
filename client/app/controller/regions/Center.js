@@ -9,17 +9,44 @@ Ext.define ('TEWC.controller.regions.Center' , {
 	
 	// Views
 	views: ['regions.Center'] ,
+	models: ['regions.East'] ,
+	stores: ['regions.East'] ,
 	
 	// Configuration
 	init: function () {
 		this.control ({
 			// Center region
-			'centerregion > panel' : {
+			'centerregion > tabpanel' : {
 				// Resize the div chat when the panel chat is resized
-				resize : function (reg, width, height, opts) {
-					var divChat = document.getElementById ('chatBox');
+				resize : function (panel, width, height, opts) {
+					// Useful when resize event is fired
+					if (width == null) width = Ext.getCmp('chatPanel').getWidth ();
+					if (height == null) height = Ext.getCmp('chatPanel').getHeight ();
+				
+					// Always Main Room resize
+					var divChat = document.getElementById ('mainRoom');
+					
 					divChat.style.height = (height - 33) + 'px';
 					divChat.style.width = (width - 10) + 'px';
+					
+					// Check for other tabs
+					var userStore = this.getRegionsEastStore ();
+					
+					// Don't count userself
+					if (userStore.getCount () > 1) {
+						for (var i = 0; i < userStore.getCount (); i++) {
+							var user = userStore.getAt(i).get ('user');
+								if (user != userName) {
+									divChat = document.getElementById ('room_' + user);
+									
+									// Resize only existing private chats
+									if (divChat != null) {
+										divChat.style.height = (height - 33) + 'px';
+										divChat.style.width = (width - 10) + 'px';
+									}
+								}
+						}
+					}
 				}
 			} ,
 			// Send message textfield
@@ -38,8 +65,35 @@ Ext.define ('TEWC.controller.regions.Center' , {
 		// Empty messages aren't accepted
 		if (textfield.getValue () != '') {
 			try {
-				// Send message
-				socket.send ('<b>' + userName + ':</b> ' + this.html2text (textfield.getValue ()));
+				var tpChat = textfield.up('centerregion').down ('tabpanel');
+				var toSend = new Array ();
+				
+				// Send message to the central square
+				if (tpChat.getActiveTab().title == 'Central Square') {
+					toSend.push (['global' , this.html2text (textfield.getValue ())]);
+					socket.send (toSend);
+				}
+				// Or in a private chatroom
+				else {
+					// private -> msg -> receiver
+					var receiverUsername = tpChat.getActiveTab().title;
+					var userStore = this.getRegionsEastStore ();
+					
+					if (userStore.findRecord ('user', receiverUsername) != null) {
+						var msgText = this.html2text (textfield.getValue ());
+						toSend.push (['private' , msgText, receiverUsername]);
+						socket.send (toSend);
+					}
+					else {
+						Ext.Msg.show ({
+							title: 'Error' ,
+							msg: '<b>' + receiverUsername + '</b> isn\'t with us anymore. R.I.P.!' ,
+							buttons: Ext.Msg.OK,
+							icon: Ext.Msg.ERROR
+						});
+					}
+				}
+				
 				textfield.reset ();
 			}
 			catch (err) {

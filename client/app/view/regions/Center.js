@@ -12,14 +12,20 @@ Ext.define ('TEWC.view.regions.Center' , {
 	region: 'center' ,
 	layout: 'anchor' ,
 	items: [{
-		xtype: 'panel' ,
-		title: 'Chat' ,
+		xtype: 'tabpanel' ,
+//		title: 'Chat' ,
+		activeItem: 0 ,
 		id: 'chatPanel' ,
 		anchor: '100% 95%' ,
 		layout: 'anchor' ,
 		bodyPadding: '5px' ,
 		margin: '5 0 10 5' ,
-		html: '<div id="chatBox" style="overflow-x:auto; overflow-y:auto;"></div>'
+		
+		// Tabs
+		items: [{
+			title: 'Central Square' ,
+			html: '<div id="mainRoom" style="overflow-x:auto; overflow-y:auto;"></div>'
+		}]
 	} , {
 		// Send message box
 		xtype: 'textfield' ,
