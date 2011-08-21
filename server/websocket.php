@@ -22,7 +22,7 @@ class WebSocket {
 		socket_bind ($this->master, $address, $port) or die ('socket_bind() failed');
 		socket_listen ($this->master, 20) or die ('socket_listen() failed');
 		$this->sockets[] = $this->master;
-		$this->say ('Server Started : ' . date ('Y-m-d H:i:s'));
+		$this->say ("\nServer Started : " . date ('Y-m-d H:i:s'));
 		$this->say ('Listening on   : ' . $address . ' port ' . $port);
 		$this->say ('Master socket  : ' . $this->master . "\n");
 		$this->lastDate = date('l j F Y');
@@ -80,6 +80,8 @@ class WebSocket {
 	
 	# Broadcast the message
 	function sendGlobal ($msg, $sender) {
+		$this->console ($sender->name . ': ' . $msg);
+		
 		$msg = '<b>' . $sender->name . ':</b> ' . $msg;
 		$this->process ($msg);
 	}
@@ -99,6 +101,8 @@ class WebSocket {
 	
 	# Send message both to the sender and to the receiver
 	function sendPrivate ($sender, $receiver, $msg) {
+		$this->console ('From ' . $sender->name . ' to ' . $receiver . ': ' . $msg);
+		
 		# Get user object of the receiver
 		$receiver = $this->findUserByName ($receiver);
 		
@@ -106,9 +110,8 @@ class WebSocket {
 		$msg = '<b>' . $sender->name . ':</b> ' . $msg;
 		
 		# Set date
-		$msg = '<i>' . date('H:i:s') . '</i>' . ' - ' . $msg;
-		if ($this->lastDate != date ('l j F Y')) {
-			$this->lastDate = date ('l j F Y');
+		$msg = '[' . date('H:i:s') . ']' . ' - ' . $msg;
+		if (!(is_null ($this->checkDate ()))) {
 			$msg = '<br /><span style="color:blue"><b>*** ' . $this->lastDate . ' ***' . '</b></span><br /><br />' . $msg;
 		}
 		
@@ -130,13 +133,16 @@ class WebSocket {
 			$msgUserList = 'userlist:' . implode (':' , $this->usernameList);
 			$this->sendUserList ($msgUserList);
 			# Notify every users
-			$this->process ('<span style="color:green"><b>' . $username . '</b> is just arrived!</span>');
+			$this->process ('<span style="color:green"><b>' . $username . '</b> has just arrived!</span>');
+			
+			$this->console ($username . ' has just arrived!');
 		}
 		else {
 			$this->disconnect ($userToLogin->socket);
 		}
 	}
 
+	# Broadcast the users list
 	function sendUserList ($userlist) {
 		$userlist = 'global:' . $userlist;
 		foreach ($this->sockets as $socket) {
@@ -147,10 +153,10 @@ class WebSocket {
 		}
 	}
 
+	# Broadcast a message
 	function process ($msg) {
-		$msg = '<i>' . date('H:i:s') . '</i>' . ' - ' . $msg;
-		if ($this->lastDate != date ('l j F Y')) {
-			$this->lastDate = date ('l j F Y');
+		$msg = '[' . date('H:i:s') . ']' . ' - ' . $msg;
+		if (!(is_null ($this->checkDate ()))) {
 			$msg = '<br /><span style="color:blue"><b>*** ' . $this->lastDate . ' ***' . '</b></span><br /><br />' . $msg;
 		}
 		
@@ -165,7 +171,6 @@ class WebSocket {
 	}
 
 	function send ($client, $msg) { 
-		$this->say ('> ' . $msg);
 		$msg = $this->wrap ($msg);
 		socket_write ($client, $msg, strlen ($msg));
 	}
@@ -198,7 +203,7 @@ class WebSocket {
 				$msgUserList = 'userlist:' . implode (':' , $this->usernameList);
 				# Notify every users except the disconnected one
 				$this->process ('<span style="color:red"><b>' . $disconnectedUser . '</b> has left!</span>');
-				$this->say ($msgUserList);
+				$this->console ($disconnectedUser . ' has left!');
 				$this->sendUserList ($msgUserList);
 			}
 			else {
@@ -216,13 +221,13 @@ class WebSocket {
 
 	function dohandshake ($user, $buffer) {
 		$this->say ("\nRequesting handshake...");
-		$this->say ($buffer);
+		$this->say ("\n" . $buffer . "\n");
 		list ($resource, $host, $origin) = $this->getheaders ($buffer);
 		$this->say ('Handshaking...');
 		$hs = (string) new WebSocketHandshake ($buffer);
 		socket_write ($user->socket, $hs, strlen ($hs));
 		$user->handshake = true;
-		$this->say ('Done handshaking...');
+		$this->say ("Done handshaking!\n");
 		return true;
 	}
 
@@ -269,6 +274,26 @@ class WebSocket {
 	
 	function unwrap ($msg = '') {
 		return substr ($msg, 1, strlen ($msg) - 2);
+	}
+	
+	# Debugger more accurate than 'say'
+	function console ($msg = '') {
+		if (!(is_null ($this->checkDate ()))) {
+			echo '> *** ' . $this->lastDate . ' ***';
+		}
+		
+		echo '> [' . date('H:i:s') . '] - ' . $msg . "\n";
+	}
+	
+	# Checks if date is changed
+	function checkDate () {
+		$oldDate = null;
+		if ($this->lastDate != date ('l j F Y')) {
+			$oldDate = $this->lastDate;
+			$this->lastDate = date ('l j F Y');
+		}
+		
+		return $oldDate;
 	}
 }
 

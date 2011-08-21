@@ -13,7 +13,7 @@ Ext.define ('TEWC.view.regions.Center' , {
 	layout: 'anchor' ,
 	items: [{
 		xtype: 'tabpanel' ,
-//		title: 'Chat' ,
+		minTabWidth: 50 ,
 		activeItem: 0 ,
 		id: 'chatPanel' ,
 		anchor: '100% 95%' ,
