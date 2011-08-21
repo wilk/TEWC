@@ -17,9 +17,15 @@
 			if ('WebSocket' in window) {
 				// Loading Progress Bar
 				document.write ('<div id="extjsPreloader">Loading ExtJS Framework... <br /\><progress style="width:400px" /\></div>');
+				document.write ('<link rel="stylesheet" type="text/css" href="ext-4.0.2a/resources/css/ext-all.css" /\>');
+				
+				// User Mode
+				document.write ('<script type="text/javascript" src="ext-4.0.2a/ext-all.js"\> <\/script>');
+				
+				// Developer Mode
+				// document.write ('<script type="text/javascript" src="ext-4.0.2a/ext-all-debug.js"\> <\/script>');
+				
 				document.write (
-					'<link rel="stylesheet" type="text/css" href="ext-4.0.2a/resources/css/ext-all.css" /\>' +
-					'<script type="text/javascript" src="ext-4.0.2a/ext-all-debug.js"\> <\/script>' +
 					'<script type="text/javascript" src="app.js"\> <\/script>' +
 					'<script type="text/javascript" src="loader.js"\> <\/script>'
 				);

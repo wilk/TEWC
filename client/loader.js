@@ -6,7 +6,7 @@
 
 var userName = '';
 var socket;
-var host = 'ws://localhost:12345/test-TEWC/server.php';
+var host = 'ws://localhost:12345/TEWC/server/server.php';
 
 // Set loading configuration
 Ext.Loader.setConfig ({

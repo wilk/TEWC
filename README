@@ -1,12 +1,48 @@
 TEWC : The Easiest Web Chat
-A simply web chat made with ExtJS 4 and websocket of HTML5
+A simply web chat made with ExtJS 4 and WebSocket of HTML5.
+
+Note
+----
+For now, it's supported only from Chrome/Chromium.
+It's been developed with handshake_76 of HTML5 WebSocket.
 
 Requirements
+------------
 - Apache2
 - PHP5
 - A browser which supports websockets
 
-Install
-- Unpack both client and server folders in a single one
-- Change the global 'host' variable in the 'loader.js' file (TEWC/client/loader.js). It must point to the 'server.php' file (TEWC/server/server.php)
-- Start the websocket (e.g. php /var/www/TEWC-test/server.php)
+Installation
+------------
+1A) Install from package
+- Download TEWC archive at https://github.com/wilk/TEWC/tarball/master
+- Unpack TEWC archive :
+	$ tar -xvf wilk-TEWC-9e3cc86.tar.gz
+- Rename TEWC folder :
+	$ mv wilk-TEWC-9e3cc86 TEWC
+- Move TEWC folder into your webserver folder :
+	$ mv TEWC /var/www/
+
+OR
+
+1B) Install from GIT
+- Download TEWC repository into your webserver folder :
+	$ cd /var/www/
+	$ git clone git://github.com/wilk/TEWC.git
+
+2) Launch the websocket :
+	$ php /var/www/TEWC/server/server.php
+
+3) Open your browser and go to 'http://localhost/TEWC/client'
+
+Tips'n'Tricks
+-------------
+- Run the websocket in background mode with logging:
+	$ php /var/www/TEWC/server/server.php > mylogfile.log
+	$ ^Z (control + Z)
+	$ bg
+	
+Contacts
+--------
+Email : wilk3ert@gmail.com
+Web Site : www.wilky.it
